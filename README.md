@@ -5,7 +5,9 @@
 ### Developer Instructions
 
 #### Setup and installation
+Clone the repository. 
 Create a Python venv (virtual environment) - currently tested on Python 3.12 using macOS.
+Within a terminal, navigate to the `boards-listing-tool` directory.
 
 Copy `boards-listing-tool/.env.template` and name it `boards-listing-tool/.env`. Update the `BOARDS_DIRECTORY` value to point to the full directory containing the json files. e.g. in this project, they are stored in the `<MY PATH>/boards-listing-tool/data` folder.
 
