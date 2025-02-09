@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 from operator import itemgetter
 from pathlib import Path
@@ -8,34 +9,39 @@ from pydantic import ValidationError
 
 from boards_listing_tool.models import Board
 
+# Configure logging
+logging.basicConfig(level=logging.WARNING)
+logger = logging.getLogger(__name__)
+
+# Unset the environment variable to avoid conflicts with the .env file
+del os.environ["BOARDS_DIRECTORY"]
 load_dotenv()  # take environment variables from .env.
 
 
 def get_json_file_paths():
-    file_path = os.getenv("BOARDS_DIRECTORY")
-    if not file_path:
+    directory = os.getenv("BOARDS_DIRECTORY")
+    if not directory:
         raise ValueError("BOARDS_DIRECTORY environment variable is not set.")
-    return [f for f in Path(file_path).iterdir() if f.is_file()]
+    directory_path = Path(directory)
+    json_file_paths = [file for file in directory_path.rglob("*.json")]
+    return json_file_paths
 
 
 def load_json_file(json_file_path):
     try:
         return json.loads(json_file_path.read_text())
     except json.JSONDecodeError:
-        # TODO convert to a warning log message
-        print(f"Error in file, invalid json: {json_file_path}")
+        logger.warning(f"Error in file, invalid json: {json_file_path}")
         return None
 
 
 def check_file_boards(json_file, json_file_path):
     if json_file.get("boards", None) is None:
-        # TODO convert to a warning log message
-        print(f"File does not contain boards, discarding: {json_file_path}")
+        logger.warning(f"File does not contain boards, discarding: {json_file_path}")
         return False
     file_boards = json_file["boards"]
     if not isinstance(file_boards, list):
-        # TODO convert to a warning log message
-        print(f"Error in file, boards is not a list: {json_file_path}")
+        logger.warning(f"Error in file, boards is not a list: {json_file_path}")
         return False
     return True
 
@@ -44,8 +50,9 @@ def validate_board_schema(board, json_file_path):
     try:
         return Board(**board)
     except ValidationError:
-        # TODO convert to a warning log message
-        print(f"Invalid board schema in file: {json_file_path}, skipping board {board}")
+        logger.warning(
+            f"Invalid board schema in file: {json_file_path}, skipping board {board}"
+        )
         return None
 
 

@@ -37,7 +37,8 @@ join_board_data()
 
 
 ### Planned extensions
-* Complete TODOs
 * Complete test cases.
 * Handle duplicates - what counts as a duplicate? Case insensitive, all 4 fields the same?
 * Containerise the app (likely using Docker) to ensure portability between operating systems.
+* Scale: instead of reading from directory each time, load data to DB and read from there
+* API docs
