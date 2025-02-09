@@ -1,0 +1,6 @@
+[run]
+source = boards_listing_tool
+
+[report]
+fail_under = 100
+show_missing = True

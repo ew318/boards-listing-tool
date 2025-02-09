@@ -27,8 +27,8 @@ join_board_data()
 #### To run app as Flask Server
 ```flask --app boards_listing_tool.main run```
 
-#### To run tests
-```pytest tests```
+#### To run tests with coverage
+```pytest --cov```
 
 ### Tools used
 * Stack Overflow
@@ -37,7 +37,6 @@ join_board_data()
 
 
 ### Planned extensions
-* Complete test cases.
 * Handle duplicates - what counts as a duplicate? Case insensitive, all 4 fields the same?
 * Containerise the app (likely using Docker) to ensure portability between operating systems.
 * Scale: instead of reading from directory each time, load data to DB and read from there

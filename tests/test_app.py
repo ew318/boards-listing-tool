@@ -2,6 +2,8 @@ import os
 import tempfile
 from pathlib import Path
 
+import pytest
+
 from boards_listing_tool.app import (
     check_file_boards,
     get_json_file_paths,
@@ -12,6 +14,14 @@ from boards_listing_tool.app import (
 
 
 def test_get_json_file_paths(mocker):
+    # BOARDS_DIRECTORY environment variable not set
+    boards_directory_mock = mocker.patch("boards_listing_tool.app.os.getenv")
+    boards_directory_mock.return_value = None
+    with pytest.raises(
+        ValueError, match="BOARDS_DIRECTORY environment variable is not set."
+    ):
+        get_json_file_paths()
+
     # Create a temporary directory
     test_dir = tempfile.TemporaryDirectory()
     test_path = Path(test_dir.name)
@@ -28,7 +38,6 @@ def test_get_json_file_paths(mocker):
         (test_path / "file2.json"),
         (test_path / "subdir" / "file4.json"),
     }
-    boards_directory_mock = mocker.patch("boards_listing_tool.app.os.getenv")
     boards_directory_mock.return_value = str(test_path)
 
     result_files = set(get_json_file_paths())
@@ -131,6 +140,9 @@ def test_whole_happy_path(mocker):
     )
     boards1 = Path(os.path.join(cwd, "data", "boards-1.json"))
     boards2 = Path(os.path.join(cwd, "data", "boards-2.json"))
-    get_json_file_paths_mock.return_value = [boards1, boards2]
+    invalid = Path(os.path.join(cwd, "tests", "data", "invalid.json"))
+    invalid_boards = Path(os.path.join(cwd, "tests", "data", "invalid_boards.json"))
+
+    get_json_file_paths_mock.return_value = [boards1, boards2, invalid, invalid_boards]
     actual_data = join_board_data()
     assert actual_data == expected_data
